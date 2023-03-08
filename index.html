@@ -2,9 +2,50 @@
 <html lang="en">
 <head>
     <title>Document</title>
+    <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-    <h1>Calculadora de sueldos</h1>
+    <h1 class="title">CALCULADORA DE SUELDOS</h1>
+    <p class="text">Completá los campos requeridos con tu información y calculá tu sueldo líquido.</p>
+    <script src="main.js"></script>
+    <form id="form">
+        <label for="sueldo">Sueldo nominal:</label>
+        <input type="text" id="sueldonominal" name="sueldonominal"><br><br>
+        
+        <h3 class="subtitle">Aporte BPS</h3>
+        <label for="hijos-cargo" id="hijosAcargo">¿Tiene hijos a cargo?</label>
+        <input type="radio" id="hijos-cargo-si" name="hijos-cargo" value="si">
+        <label for="hijos-cargo-si">Sí</label>
+        <input type="radio" id="hijos-cargo-no" name="hijos-cargo" value="no">
+        <label for="hijos-cargo-no">No</label><br><br>
+    
+        <label for="pareja-cargo" id="parejaAcargo">¿Tiene pareja/conyugue a cargo?</label>
+        <input type="radio" id="pareja-cargo-si" name="pareja-cargo" value="si">
+        <label for="pareja-cargo-si">Sí</label>
+        <input type="radio" id="pareja-cargo-no" name="pareja-cargo" value="no">
+        <label for="pareja-cargo-no">No</label><br><br>
+    
+        <h3 class="subtitle">Aporte IRPF</h3>
+        <label for="hijos-discapacidad" id="hijosdiscapacitados">Cantidad de hijos con discapacidad:</label>
+        <input type="number" id="hijos-discapacidad" name="hijos-discapacidad"><br><br>
+
+        <label for="hijos-sin-discapacidad" id="hijosnodiscapacitados">Cantidad de hijos sin discapacidad:</label>
+        <input type="number" id="hijos-sin-discapacidad" name="hijos-sin-discapacidad"><br><br>
+    
+        <h3 class="subtitle">Si es profesional:</h3>
+        <label for="aporta-solidaridad" id="fondodesolid">¿Aporta al fondo de solidaridad?</label>
+        <input type="radio" id="aporta-solidaridad-si" name="aporta-solidaridad" value="si">
+        <label for="aporta-solidaridad-si">Sí</label>
+        <input type="radio" id="aporta-solidaridad-no" name="aporta-solidaridad" value="no">
+        <label for="aporta-solidaridad-no">No</label><br><br>
+    
+        <label for="aporte-caja-notarial" id="cajaNotarial">¿Realiza aporte mensual a caja notarial?</label>
+        <input type="radio" id="aporte-caja-notarial-si" name="aporte-caja-notarial" value="si">
+        <label for="aporte-caja-notarial-si">Sí</label>
+        <input type="radio" id="aporte-caja-notarial-no" name="aporte-caja-notarial" value="no">
+        <label for="aporte-caja-notarial-no">No</label><br><br>
+    
+        <input id="submit" type="submit" value="Calcular">
+    </form>
 </body>
-<script src="main.js"></script>
 </html>
