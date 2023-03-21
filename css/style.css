@@ -23,7 +23,7 @@
     align-content: left;
     font-size: 25x;
     margin-top: 50px;
-    margin-bottom: 100px;
+    margin-bottom: 50px;
     }
 
     #form{
@@ -57,3 +57,25 @@
         font-weight: 300px;
     }
 
+    #SueldoLiquido{
+        color: rgb(14, 10, 10);
+        margin-left: 500px;
+        align-content: center;
+        font-size: 30x;
+        font-family: 'Roboto Condensed', sans-serif;
+        margin-top: 50px;
+        margin-bottom: 20px;
+    }
+
+    #botonVolver{
+        font-size: 15px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        margin-left: 500px;
+        margin-right: 20px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 20px;
+        padding-right: 20px;
+        font-weight: 300px;
+    }

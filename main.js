@@ -1,8 +1,5 @@
 
 /** DATA ENTRY */
-function solicitarSueldoNominal() {
-    return prompt (`Ingrese su sueldo nominal`)
-} 
 
 class User{
     constructor (sueldoNominal, hijos, conyugue, hijoscondiscapacidad, hijossindiscapacidad, fondosolidaridad, cajanotarial){
@@ -15,16 +12,6 @@ class User{
     this.cajanotarial = cajanotarial;
     }
 }
-
-var sueldoNominal = document.getElementById("sueldoNominal")
-var hijosAcargo = document.getElementById("hijosAcargo")
-var conyugueAcargo = document.getElementById("parejaAcargo")
-var hijosCondiscapacidad = document.getElementById("hijosdiscapacitados")
-var hijosSindiscapacidad = document.getElementById("hijosnodiscapacitados")
-var fondodesolid = document.getElementById("fondodesolid")
-var cajaNotarial = document.getElementById("cajaNotarial")
-
-var Usuario = new User(sueldoNominal, hijosAcargo, conyugueAcargo, hijosCondiscapacidad, hijosSindiscapacidad, fondodesolid, cajaNotarial)
 
 /** CALCULATIONS */
 
@@ -49,7 +36,7 @@ function calculoSueldoLiquido(sueldoNominal){
             this.aporteirpf = aporteirpf;
         }
 
-        pertenece(sueldoNominal){
+        pertenece(sueldoNominal){  // verifica en que franja de IRPF 'cae' el sueldo Nominal
             if ((sueldoNominal > this.min) && (sueldoNominal < this.max) )
             return true
             else return false
@@ -81,7 +68,7 @@ function calculoSueldoLiquido(sueldoNominal){
     const franjas = [franja1, franja2, franja3, franja4, franja5, franja6, franja7, franja8] 
     var irpf = new IRPF (franjas)
     var descuentoirpf = irpf.calculodescuentoIRPF(sueldoNominal)
-
+    
     if (sueldoNominal > 25 * bpc) descuento_fonasa = (sueldoNominal * aporte_fonasa_desde25bpc) / 100
     else descuento_fonasa = (sueldoNominal * aporte_fonasa_hasta25bpc) / 100
     if (sueldoNominal > 15 * bpc) descuentoirpf = (descuentoirpf * tasa_deducciones_desde15bpc) / 100
@@ -89,12 +76,38 @@ function calculoSueldoLiquido(sueldoNominal){
     return (Math.round (sueldoNominal - descuentoirpf - descuento_jubilatorio - descuento_frl - descuento_fonasa))
 }
 
-function mostrarSueldoLiquido(sueldoLiquido) {
-    alert ("Su sueldo liquido es de $" + sueldoLiquido)
-}
 
+var form = document.querySelector('#form');
 
-/** MAIN */
-var sueldoNominal = solicitarSueldoNominal()
-var sueldoLiquido = calculoSueldoLiquido(sueldoNominal)
-mostrarSueldoLiquido(sueldoLiquido)
+form.addEventListener('submit', (event) => {
+    event.preventDefault(); // evita que se recargue la página al enviar el formulario
+    
+    var sueldoNominal = parseFloat(document.querySelector('#sueldonominal').value);
+    var tieneHijos = document.querySelector('input[name="hijos-cargo"]:checked').value === 'si';
+    var tieneConyugue = document.querySelector('input[name="pareja-cargo"]:checked').value === 'si';
+    var hijosConDiscapacidad = parseInt(document.querySelector('#hijos-discapacidad').value);
+    var hijosSinDiscapacidad = parseInt(document.querySelector('#hijos-sin-discapacidad').value);
+    var aportaFondoSolidaridad = document.querySelector('input[name="aporta-solidaridad"]:checked').value === 'si';
+    var aportaCajaNotarial = document.querySelector('input[name="aporte-caja-notarial"]:checked').value === 'si';
+    
+    var user = new User(sueldoNominal, tieneHijos, tieneConyugue, hijosConDiscapacidad, hijosSinDiscapacidad, aportaFondoSolidaridad, aportaCajaNotarial);
+    var sueldoLiquido = calculoSueldoLiquido(user.sueldoNominal, user.hijos, user.conyugue, user.hijoscondiscapacidad, user.hijossindiscapacidad, user.fondosolidaridad, user.cajanotarial);
+    
+    let final = document.getElementById("inicio");
+    final.remove();
+
+    let divSueldoLiquido = document.createElement("div");
+    divSueldoLiquido.innerHTML = `<h2 id=SueldoLiquido> Tu sueldo líquido es de $ ${sueldoLiquido} </h2>`;
+    document.body.appendChild(divSueldoLiquido);
+    
+    let divbotonVolver = document.createElement("div");
+    divbotonVolver.innerHTML = `<button id="botonVolver">VOLVER</button>`;
+    document.body.appendChild(divbotonVolver);
+
+    let botonVolver = document.getElementById("botonVolver")
+    botonVolver.onclick = () =>{location.reload()}
+});
+
+const guardarLocal = (clave, valor) => { localStorage.setItem(clave, valor) };
+guardarLocal("datosUser", JSON.stringify(User));
+const almacenados = JSON.parse(localStorage.getItem("User"));
