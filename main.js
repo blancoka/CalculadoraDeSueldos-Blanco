@@ -106,11 +106,12 @@ function calculoSueldoLiquido(user){
     
         calculodescuentoIRPF(sueldoNominal) {
             var franja = franjas.find(f => f.pertenece(sueldoNominal)); //me devuelve la franja que cumple que franja.min < sueldoNominal < franja.max
-            var descuento = (franja.aporteirpf * sueldoNominal) / 100; //calculo la plata que se le va a descontar de irpf segun el sueldo nominal que ingreso
+            var descuento = (franja.aporteirpf * sueldoNominal) / 100; //calcula el dinero que se le va a descontar de IRPF segun el sueldo nominal que ingreso
             return descuento;
         }
         }
 
+            // Franjas de IRPF segun sueldonominal 
     var franja1 = new Franja(0, (7 * bpc) - 1, 0)
     var franja2 = new Franja(7 * bpc, (10 * bpc) - 1, 10)
     var franja3 = new Franja(10 * bpc, (15 * bpc) - 1, 15)
@@ -122,8 +123,9 @@ function calculoSueldoLiquido(user){
 
     const franjas = [franja1, franja2, franja3, franja4, franja5, franja6, franja7, franja8] 
     var irpf = new IRPF (franjas)
-    var descuentoirpf = irpf.calculodescuentoIRPF(user.sueldoNominal)
+    var descuentoirpf = irpf.calculodescuentoIRPF(user.sueldoNominal)  // calcula ejectivamente el descuento 
     
+    // calculo de descuento de Fonasa segun sueldo nominal //
     if (user.sueldoNominal > 25 * bpc) descuento_fonasa = (user.sueldoNominal * aporte_fonasa_desde25bpc) / 100
     else descuento_fonasa = (user.sueldoNominal * aporte_fonasa_hasta25bpc) / 100
     if (user.sueldoNominal > 15 * bpc) descuentoirpf = (descuentoirpf * tasa_deducciones_desde15bpc) / 100
@@ -142,7 +144,7 @@ submit.addEventListener('click', (event) => {
         cancelButtonText: 'Cancelar'
         })
         .then((result) => {
-            if (result.isConfirmed) { //calcula el sueldo liquido 
+            if (result.isConfirmed) { // calcula el sueldo liquido segun los datos que ingresa el User 
                 var sueldoNominal = parseFloat(document.querySelector('#sueldonominal').value);
                 var tieneHijos = document.querySelector('input[name="hijos-cargo"]:checked').value === 'si';
                 var tieneConyugue = document.querySelector('input[name="pareja-cargo"]:checked').value === 'si';
@@ -160,8 +162,9 @@ submit.addEventListener('click', (event) => {
                 let divSueldoLiquido = document.createElement("div");
                 divSueldoLiquido.innerHTML = `<h2 id=SueldoLiquido> Tu sueldo líquido es de $ ${sueldoLiquido} </h2>`;
                 document.body.appendChild(divSueldoLiquido);
-            
-                let divbotonVolver = document.createElement("div");
+                
+                // para volver a la pagina inicial // 
+                let divbotonVolver = document.createElement("div");  
                 divbotonVolver.innerHTML = `<button id="botonVolver">VOLVER</button>`;
                 document.body.appendChild(divbotonVolver);
             
