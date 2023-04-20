@@ -1,17 +1,16 @@
 
 /** DATA ENTRY */
-
 class User{
-    constructor (sueldoNominal, hijos, conyugue, hijoscondiscapacidad, hijossindiscapacidad, fondosolidaridad, cajanotarial){
+    constructor (sueldoNominal, hijos, conyugue, hijosConDiscapacidad, hijosSinDiscapacidad, aportaFondoSolidaridad, cajaNotarial){
     this.sueldoNominal = sueldoNominal; 
     this.hijos = hijos; 
     this.conyugue = conyugue;
-    this.hijoscondiscapacidad = hijoscondiscapacidad;
-    this.hijossindiscapacidad = hijossindiscapacidad;
-    this.fondosolidaridad = fondosolidaridad;
-    this.cajanotarial = cajanotarial;
+    this.hijosConDiscapacidad = hijosConDiscapacidad;
+    this.hijosSinDiscapacidad = hijosSinDiscapacidad;
+    this.aportaFondoSolidaridad = aportaFondoSolidaridad;
+    this.cajaNotarial = cajaNotarial;
     }
-
+    
     calcularSueldoLiquidoAPI() {
         const url = 'https://jsonplaceholder.typicode.com/posts';
         const options = {
@@ -19,24 +18,11 @@ class User{
             headers: {
             'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-            sueldoNominal: this.sueldoNominal,
-            hijos: this.hijos,
-            conyugue: this.conyugue,    
-            hijoscondiscapacidad: this.hijoscondiscapacidad,
-            hijossindiscapacidad: this.hijossindiscapacidad,
-            fondosolidaridad: this.fondosolidaridad,
-            cajanotarial: this.cajanotarial
-            })
+            body: JSON.stringify(this)
         };
     
         return fetch(url, options)
-            .then(response => {
-            if (!response.ok) {
-            throw new Error('La solicitud de calcular sueldo líquido falló');
-            }
-            return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
             // Devuelve los resultados del cálculo de sueldo líquido
             return data;
@@ -46,7 +32,6 @@ class User{
             });
         }
 }
-
 /** CALCULATIONS */
 
 function calculoSueldoLiquido(user){
@@ -58,7 +43,7 @@ function calculoSueldoLiquido(user){
         /* Porcentaje de aportes FONASA para personas con salario desde a 2.5 BPC. */
     const aporte_fonasa_desde25bpc = 4.5;
 
-    const aporte_frl = 0.1;
+    const aporte_FRL = 0.1;
     /* Porcentaje de deducciones de IRPF para personas con salario hasta 15 BPC. */
     const tasa_deducciones_hasta15bpc = 10;
     /* Porcentaje de deducciones de IRPF para personas con salario desde 15 BPC. */
@@ -83,13 +68,13 @@ function calculoSueldoLiquido(user){
 
     var descuento_fonasa = 0;
     var descuento_jubilatorio = (user.sueldoNominal * aporte_jubilatorio) / 100
-    var descuento_frl = (user.sueldoNominal * aporte_frl) / 100
+    var descuento_FRL = (user.sueldoNominal * aporte_FRL) / 100
 
     class Franja {
-        constructor(min, max, aporteirpf){
+        constructor(min, max, aporteIRPF){
             this.min = min;
             this.max = max;
-            this.aporteirpf = aporteirpf;
+            this.aporteIRPF = aporteIRPF;
         }
 
         pertenece(sueldoNominal){  // verifica en que franja de IRPF 'cae' el sueldo Nominal
@@ -106,12 +91,12 @@ function calculoSueldoLiquido(user){
     
         calculodescuentoIRPF(sueldoNominal) {
             var franja = franjas.find(f => f.pertenece(sueldoNominal)); //me devuelve la franja que cumple que franja.min < sueldoNominal < franja.max
-            var descuento = (franja.aporteirpf * sueldoNominal) / 100; //calcula el dinero que se le va a descontar de IRPF segun el sueldo nominal que ingreso
+            var descuento = (franja.aporteIRPF * sueldoNominal) / 100; //calcula el dinero que se le va a descontar de IRPF segun el sueldo nominal que ingreso
             return descuento;
         }
         }
 
-            // Franjas de IRPF segun sueldonominal 
+        // Franjas de IRPF segun sueldonominal 
     var franja1 = new Franja(0, (7 * bpc) - 1, 0)
     var franja2 = new Franja(7 * bpc, (10 * bpc) - 1, 10)
     var franja3 = new Franja(10 * bpc, (15 * bpc) - 1, 15)
@@ -123,56 +108,59 @@ function calculoSueldoLiquido(user){
 
     const franjas = [franja1, franja2, franja3, franja4, franja5, franja6, franja7, franja8] 
     var irpf = new IRPF (franjas)
-    var descuentoirpf = irpf.calculodescuentoIRPF(user.sueldoNominal)  // calcula ejectivamente el descuento 
+    var descuentoirpf = irpf.calculodescuentoIRPF(user.sueldoNominal)  // calcula efectivamente el descuento 
     
     // calculo de descuento de Fonasa segun sueldo nominal //
     if (user.sueldoNominal > 25 * bpc) descuento_fonasa = (user.sueldoNominal * aporte_fonasa_desde25bpc) / 100
     else descuento_fonasa = (user.sueldoNominal * aporte_fonasa_hasta25bpc) / 100
     if (user.sueldoNominal > 15 * bpc) descuentoirpf = (descuentoirpf * tasa_deducciones_desde15bpc) / 100
     else descuentoirpf = (descuentoirpf * tasa_deducciones_hasta15bpc) / 100
-    return (Math.round (user.sueldoNominal - descuentoirpf - descuento_jubilatorio - descuento_frl - descuento_fonasa - IRPF_sindiscapacidad - IRPF_condiscapacidad - descuento_fondosolidaridad))
+    return (Math.round (user.sueldoNominal - descuentoirpf - descuento_jubilatorio - descuento_FRL - descuento_fonasa - IRPF_sindiscapacidad - IRPF_condiscapacidad - descuento_fondosolidaridad))
 }
 
-
-var form = document.querySelector('#submit');
-submit.addEventListener('click', (event) => {
+    var submit = document.querySelector('#submit');
+    submit.addEventListener('click', (event) => {
     event.preventDefault(); // evita que se recargue la página al enviar el formulario
-    Swal.fire({
-        title: "¿Deseas continuar?",
-        showCancelButton: true,
-        confirmButtonText: 'Sí, continuar',
-        cancelButtonText: 'Cancelar'
-        })
-        .then((result) => {
-            if (result.isConfirmed) { // calcula el sueldo liquido segun los datos que ingresa el User 
-                var sueldoNominal = parseFloat(document.querySelector('#sueldonominal').value);
-                var tieneHijos = document.querySelector('input[name="hijos-cargo"]:checked').value === 'si';
-                var tieneConyugue = document.querySelector('input[name="pareja-cargo"]:checked').value === 'si';
-                var hijosConDiscapacidad = parseInt(document.querySelector('#hijos-discapacidad').value);
-                var hijosSinDiscapacidad = parseInt(document.querySelector('#hijos-sin-discapacidad').value);
-                var aportaFondoSolidaridad = document.querySelector('input[name="aporta-solidaridad"]:checked').value === 'si';
-                var aportaCajaNotarial = document.querySelector('input[name="aporte-caja-notarial"]:checked').value === 'si';
-                
-                var user = new User(sueldoNominal, tieneHijos, tieneConyugue, hijosConDiscapacidad, hijosSinDiscapacidad, aportaFondoSolidaridad, aportaCajaNotarial);
-                var sueldoLiquido = calculoSueldoLiquido(user);
-                
-                let final = document.getElementById("inicio");
-                final.remove();
-            
-                let divSueldoLiquido = document.createElement("div");
-                divSueldoLiquido.innerHTML = `<h2 id=SueldoLiquido> Tu sueldo líquido es de $ ${sueldoLiquido} </h2>`;
-                document.body.appendChild(divSueldoLiquido);
-                
-                // para volver a la pagina inicial // 
-                let divbotonVolver = document.createElement("div");  
-                divbotonVolver.innerHTML = `<button id="botonVolver">VOLVER</button>`;
-                document.body.appendChild(divbotonVolver);
-            
-                let botonVolver = document.getElementById("botonVolver")
-                botonVolver.onclick = () =>{location.reload()}
-            }
-            })
-});
+    var sueldoNominal = parseFloat(document.querySelector('#sueldonominal').value);
+    if (!sueldoNominal) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            title: "Por favor ingresa tu sueldo liquido",
+            confirmButtonText: 'Ok'
+        });
+        return;
+        }
+        else {
+        var tieneHijos = document.querySelector('input[name="hijos-cargo"]:checked').value === 'si';
+        var tieneConyugue = document.querySelector('input[name="pareja-cargo"]:checked').value === 'si';
+        var hijosConDiscapacidad = parseInt(document.querySelector('#hijos-discapacidad').value);
+        var hijosSinDiscapacidad = parseInt(document.querySelector('#hijos-sin-discapacidad').value);
+        var aportaFondoSolidaridad = document.querySelector('input[name="aporta-solidaridad"]:checked').value === 'si';
+        var aportaCajaNotarial = document.querySelector('input[name="aporte-caja-notarial"]:checked').value === 'si';
+        
+        var user = new User(sueldoNominal, tieneHijos, tieneConyugue, hijosConDiscapacidad, hijosSinDiscapacidad, aportaFondoSolidaridad, aportaCajaNotarial);
+        var sueldoLiquido = calculoSueldoLiquido(user);
+        
+        let final = document.getElementById("inicio");
+        final.remove();
+
+        let divSueldoLiquido = document.createElement("div");
+        var sueldoLiquidosanitizado = sueldoLiquido.toLocaleString();
+        console.log (sueldoLiquidosanitizado);
+        divSueldoLiquido.innerHTML = `<h2 id=SueldoLiquido> Tu sueldo líquido es de $ ${sueldoLiquidosanitizado} </h2>`;
+        document.body.appendChild(divSueldoLiquido);
+        
+        // para volver a la pagina inicial // 
+        let divbotonVolver = document.createElement("div");  
+        divbotonVolver.innerHTML = `<button id="botonVolver">VOLVER</button>`;
+        document.body.appendChild(divbotonVolver);
+
+        let botonVolver = document.getElementById("botonVolver")
+        botonVolver.onclick = () =>{location.reload()}
+
+    }
+    })
 
 const guardarLocal = (clave, valor) => { localStorage.setItem(clave, valor) };
 guardarLocal("datosUser", JSON.stringify(User));
